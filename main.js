@@ -91,6 +91,23 @@ articlesRouter.delete("/articles/:id", (req, res) => {
   res.json(result);
 });
 
+articlesRouter.delete("/articles", (req, res) => {
+  let result = {};
+  const author = req.body.author;
+  for (let i = 0; i < articles.length; i++) {
+    console.log(articles[i].author);
+    if (articles[i].author === author) {
+      articles.splice(i, 1);
+      result = {
+        success: "true",
+        massage: `Success delete all the articles for the author => ${author}`,
+      };
+    }
+  }
+  res.status(200);
+  res.json(result);
+});
+
 app.use(articlesRouter);
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
