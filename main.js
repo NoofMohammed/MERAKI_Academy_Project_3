@@ -60,6 +60,19 @@ articlesRouter.post("/articles", (req, res) => {
   res.status(201);
   res.json(articles);
 });
+articlesRouter.put("/articles/:id", (req, res) => {
+  const id = req.params.id;
+  const objBody = req.body;
+  let article = {};
+  for (let i = 0; i < articles.length; i++) {
+    if (id == articles[i].id) {
+      article = { ...articles[i], ...objBody };
+      articles[i] = article;
+    }
+  }
+  res.status(200);
+  res.json(articles);
+});
 
 app.use(articlesRouter);
 app.listen(port, () => {
