@@ -6,6 +6,9 @@ const port = 5000;
 app.use(express.json());
 const articlesRouter = express.Router();
 
+
+
+
 const articles = [
   {
     id: 1,
@@ -32,8 +35,26 @@ articlesRouter.get("/articles", (req, res) => {
   res.json(articles);
 });
 
-app.use(articlesRouter);
 
+
+
+articlesRouter.get("/articles/:id",(req,res) => {
+    const id = req.params.id
+    const artic = articles.find((elem) =>{
+       return elem.id === Number(id) 
+    })
+    res.status(200)
+    res.json(artic)
+    
+})
+
+
+
+
+
+
+
+app.use(articlesRouter);
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
 });
