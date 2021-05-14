@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const port = 5000;
 
+const { uuid } = require("uuidv4");
+
 app.use(express.json());
 const articlesRouter = express.Router();
 
@@ -49,6 +51,14 @@ articlesRouter.get("/articles/:id", (req, res) => {
   });
   res.status(200);
   res.json(artic);
+});
+
+articlesRouter.post("/articles", (req, res) => {
+  const article = req.body;
+  article.id = uuid();
+  articles.push(article);
+  res.status(201);
+  res.json(articles);
 });
 
 app.use(articlesRouter);
