@@ -74,6 +74,23 @@ articlesRouter.put("/articles/:id", (req, res) => {
   res.json(articles);
 });
 
+articlesRouter.delete("/articles/:id", (req, res) => {
+  let result = {};
+
+  const id = req.params.id;
+  for (let i = 0; i < articles.length; i++) {
+    if (id == articles[i].id) {
+      articles.splice(i, 1);
+      result = {
+        success: "true",
+        massage: `Success Delete article with ${id}`,
+      };
+    }
+  }
+  res.status(200);
+  res.json(result);
+});
+
 app.use(articlesRouter);
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
