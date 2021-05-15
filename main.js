@@ -36,7 +36,6 @@ articlesRouter.get("/articles", (req, res) => {
 
 articlesRouter.get("/articles/search_1", (req, res) => {
   const author = req.query.author;
-  console.log(author, 9999);
   const article = articles.filter((elem) => {
     return elem.author === author;
   });
@@ -95,7 +94,6 @@ articlesRouter.delete("/articles", (req, res) => {
   let result = {};
   const author = req.body.author;
   for (let i = 0; i < articles.length; i++) {
-    console.log(articles[i].author);
     if (articles[i].author === author) {
       articles.splice(i, 1);
       result = {
