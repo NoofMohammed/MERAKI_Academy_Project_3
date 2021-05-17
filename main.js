@@ -44,22 +44,25 @@ articlesRouter.get("/articles", (req, res) => {
     });
 });
 
-articlesRouter.get("/articles/search_1", (req, res) => {
-  //   articlesSch
-  //     .find({})
-  //     .then((result) => {
-  //       res.send(result);
-  //     })
-  //     .catch((err) => {
-  //       res.send(err);
-  //     });
+articlesRouter.get("/articles/search_1", async (req, res) => {
+  const firstName = req.query.author;
+  const author = await users.findOne({ firstName });
+
+  articlesSch
+    .find({ author: author._id })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
   // });
-  const author = req.query.author;
-  const article = articles.filter((elem) => {
-    return elem.author === author;
-  });
-  res.status(200);
-  res.json(article);
+  // const author = req.query.author;
+  // const article = articles.filter((elem) => {
+  //   return elem.author === author;
+  // });
+  // res.status(200);
+  // res.json(article);
 });
 
 articlesRouter.get("/articles/:id", (req, res) => {
