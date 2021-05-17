@@ -34,11 +34,26 @@ const articles = [
 ];
 
 articlesRouter.get("/articles", (req, res) => {
-  res.status(200);
-  res.json(articles);
+  articlesSch
+    .find({})
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 articlesRouter.get("/articles/search_1", (req, res) => {
+  //   articlesSch
+  //     .find({})
+  //     .then((result) => {
+  //       res.send(result);
+  //     })
+  //     .catch((err) => {
+  //       res.send(err);
+  //     });
+  // });
   const author = req.query.author;
   const article = articles.filter((elem) => {
     return elem.author === author;
@@ -48,6 +63,17 @@ articlesRouter.get("/articles/search_1", (req, res) => {
 });
 
 articlesRouter.get("/articles/:id", (req, res) => {
+  const _id = req.params.id;
+
+  articlesSch
+    .findOne({ author: "_id " })
+    .populate("users", "_id") // we can populate specific fields if you specify them in a second argument like this, .populate("role". "role")
+    .exec()
+    .then((result) => {
+      // result should return the user with the role information also
+      console.log(result);
+    });
+
   const id = req.params.id;
   const artic = articles.find((elem) => {
     return elem.id === Number(id);
@@ -57,11 +83,11 @@ articlesRouter.get("/articles/:id", (req, res) => {
 });
 
 articlesRouter.post("/articles", (req, res) => {
-  const { title, description, author } = req.body;
+  const { title, description, authorId } = req.body;
   const newArticles = new articlesSch({
     title,
     description,
-    author
+    author: authorId,
   });
   newArticles
     .save()
