@@ -1,12 +1,16 @@
 const express = require("express");
+const db = require("./db");
 
 const app = express();
+
+const { users, articlesSch } = require("./schema");
 const port = 5000;
 
 const { uuid } = require("uuidv4");
 
 app.use(express.json());
 const articlesRouter = express.Router();
+const usersRouter = express.Router();
 
 const articles = [
   {
@@ -53,12 +57,23 @@ articlesRouter.get("/articles/:id", (req, res) => {
 });
 
 articlesRouter.post("/articles", (req, res) => {
-  const article = req.body;
-  article.id = uuid();
-  articles.push(article);
-  res.status(201);
-  res.json(articles);
+  const { title, description, author } = req.body;
+  const newArticles = new articlesSch({
+    title,
+    description,
+    author
+  });
+  newArticles
+    .save()
+    .then((result) => {
+      res.status(201);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
+
 articlesRouter.put("/articles/:id", (req, res) => {
   const id = req.params.id;
   const objBody = req.body;
@@ -106,7 +121,30 @@ articlesRouter.delete("/articles", (req, res) => {
   res.json(result);
 });
 
-app.use(articlesRouter); 
+app.post("/users", (req, res) => {
+  const { firstName, lastName, age, country, email, password } = req.body;
+  const newUser = new users({
+    firstName,
+    lastName,
+    age,
+    country,
+    email,
+    password,
+  });
+  newUser
+    .save()
+    .then((result) => {
+      res.status(201);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+app.use(articlesRouter);
+app.use(usersRouter);
+
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
 });
