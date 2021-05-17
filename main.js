@@ -106,7 +106,7 @@ articlesRouter.delete("/articles", (req, res) => {
   res.json(result);
 });
 
-app.use(articlesRouter);
+app.use(articlesRouter); 
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
 });
