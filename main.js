@@ -56,33 +56,18 @@ articlesRouter.get("/articles/search_1", async (req, res) => {
     .catch((err) => {
       res.send(err);
     });
-  // });
-  // const author = req.query.author;
-  // const article = articles.filter((elem) => {
-  //   return elem.author === author;
-  // });
-  // res.status(200);
-  // res.json(article);
 });
 
-articlesRouter.get("/articles/:id", (req, res) => {
+articlesRouter.get("/articles/search_2/:id", (req, res) => {
   const _id = req.params.id;
 
   articlesSch
-    .findOne({ author: "_id " })
-    .populate("users", "_id") // we can populate specific fields if you specify them in a second argument like this, .populate("role". "role")
+    .findOne({ _id })
+    .populate("author", "firstName ")
     .exec()
     .then((result) => {
-      // result should return the user with the role information also
-      console.log(result);
+      res.send(result)
     });
-
-  const id = req.params.id;
-  const artic = articles.find((elem) => {
-    return elem.id === Number(id);
-  });
-  res.status(200);
-  res.json(artic);
 });
 
 articlesRouter.post("/articles", (req, res) => {
