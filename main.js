@@ -3,7 +3,7 @@ const db = require("./db");
 
 const app = express();
 
-const { users, articlesSch } = require("./schema");
+const { users, articlesSch, comments } = require("./schema");
 const port = 5000;
 
 app.use(express.json());
@@ -112,21 +112,42 @@ articlesRouter.delete("/articles", async (req, res) => {
     });
 });
 
-app.post("/users", (req, res) => {
-  const { firstName, lastName, age, country, email, password } = req.body;
-  const newUser = new users({
-    firstName,
-    lastName,
-    age,
-    country,
-    email,
-    password,
-  });
-  newUser
-    .save()
+// app.post("/users", (req, res) => {
+//   const { firstName, lastName, age, country, email, password } = req.body;
+//   const newUser = new users({
+//     firstName,
+//     lastName,
+//     age,
+//     country,
+//     email,
+//     password,
+//   });
+//   newUser
+//     .save()
+//     .then((result) => {
+//       res.status(201);
+//       res.json(result);
+//     })
+//     .catch((err) => {
+//       res.send(err);
+//     });
+// });
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  users
+    .findOne({ password, email })
+
     .then((result) => {
-      res.status(201);
-      res.json(result);
+      if (result) {
+        res.status(200);
+        res.json("Valid login credentials");
+      } else {
+        res.status(401);
+        res.json("Invalid login credentials");
+        ("Invalid login credentials");
+      }
     })
     .catch((err) => {
       res.send(err);
