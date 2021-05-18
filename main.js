@@ -103,7 +103,7 @@ articlesRouter.delete("/articles", async (req, res) => {
 
   const _id = author.id;
   articlesSch
-    .findOneAndRemove({ _id })
+    .deleteMany({ _id })
     .then((result) => {
       res.send(result);
     })
@@ -112,27 +112,27 @@ articlesRouter.delete("/articles", async (req, res) => {
     });
 });
 
-// app.post("/users", (req, res) => {
-//   const { firstName, lastName, age, country, email, password } = req.body;
-//   const newUser = new users({
-//     firstName,
-//     lastName,
-//     age,
-//     country,
-//     email,
-//     password,
-//   });
-//   newUser
-//     .save()
-//     .then((result) => {
-//       res.status(201);
-//       res.json(result);
-//     })
-//     .catch((err) => {
-//       res.send(err);
-//     });
-// });
-
+app.post("/users", (req, res) => {
+  const { firstName, lastName, age, country, email, password } = req.body;
+  const newUser = new users({
+    firstName,
+    lastName,
+    age,
+    country,
+    email,
+    password,
+  });
+  newUser
+    .save()
+    .then((result) => {
+      res.status(201);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+// 1.login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -148,6 +148,32 @@ app.post("/login", (req, res) => {
         res.json("Invalid login credentials");
         ("Invalid login credentials");
       }
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+// createNewComment
+
+app.post("/articles/:id/comments", (req, res) => {
+  const { comment, commenter } = req.body;
+  const newComment = new comments({
+    comment,
+    commenter,
+  });
+  // const articles = {title,description,author,comment}
+  // const article = { articles: id };
+  // article.push(comment._id);
+
+  newComment
+    .save()
+    .then((result) => {
+      db.articlesSch.update(
+        { _id },
+        { $push: { comment: _id } }
+     ).
+      res.status(201);
+      res.json(result);
     })
     .catch((err) => {
       res.send(err);
