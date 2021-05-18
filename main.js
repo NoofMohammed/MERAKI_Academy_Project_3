@@ -90,19 +90,32 @@ articlesRouter.post("/articles", (req, res) => {
 
 articlesRouter.put("/articles/:id", (req, res) => {
   const id = req.params.id;
-  const objBody = req.body;
-  let article = {};
-  for (let i = 0; i < articles.length; i++) {
-    if (id == articles[i].id) {
-      article = { ...articles[i], ...objBody };
-      articles[i] = article;
-    }
-  }
-  res.status(200);
-  res.json(articles);
+  const {title,description,authorId} = req.body;
+  articlesSch
+    .findOneAndUpdate(
+      {title,
+        description,
+        author:authorId
+      }
+    )
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
+
+
+
+  
+
 articlesRouter.delete("/articles/:id", (req, res) => {
+
+
+
+
   let result = {};
 
   const id = req.params.id;
