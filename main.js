@@ -3,7 +3,7 @@ const db = require("./db");
 
 const app = express();
 
-const { users, articlesSch, comments,suggestion} = require("./schema");
+const { users, articlesSch, comments, suggestions } = require("./schema");
 const port = 5000;
 
 app.use(express.json());
@@ -157,7 +157,8 @@ app.post("/login", (req, res) => {
 
 app.post("/articles/:id/comments", async (req, res) => {
   const articleId = req.params.id;
-  const article = await articlesSch.findOne({ _id: articleId });
+  console.log(99999999)
+  // const article = await articlesSch.findOne({ _id: articleId });
   const { comment, commenter } = req.body;
   const newComment = new comments({
     comment,
@@ -168,17 +169,44 @@ app.post("/articles/:id/comments", async (req, res) => {
     .save()
     .then((resultComment) => {
       // article.comment.push(resultComment._id).save();
-      console.log(resultComment._id, article);
+      console.log(resultComment._id, "artile");
 
       articlesSch.updateOne(
         { _id: articleId },
-        { $push: { comment: [resultComment._id] } }
-      );
+        { $push: { comment: resultComment._id } }
+      )
+      .exec()
       res.status(201);
       res.json(resultComment);
     })
     .catch((err) => {
       res.send(err);
+    });
+});
+
+// createNewSuggestion
+app.post("/articles/:id/suggestions",  (req, res) => {
+  console.log(777777)
+  const suggestionId = req.params.id;
+  // const article = await suggestions.findOne({ _id: suggestionId });
+  const { suggestion, proposed } = req.body;
+  const newSugg = new suggestions({
+    suggestion,
+    proposed,
+  });
+  newSugg
+    .save()
+    .then((resultSugg) => {
+      console.log(resultSugg._id)
+      suggestions.updateOne(
+        { _id: suggestionId },
+        { $push: { suggestion: resultSugg._id } }
+      )
+      .exec()
+    })
+    .catch((err) => {
+      res.status(401);
+      res.json(err);
     });
 });
 

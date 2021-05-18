@@ -15,6 +15,8 @@ const articlesSchema = new mongoose.Schema({
   description: { type: String },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
   comment: [{ type: mongoose.Schema.Types.ObjectId, ref: "comments" }],
+  suggestion : [{ type: mongoose.Schema.Types.ObjectId, ref: "suggestions" }],
+
   // "=> from users schema"
 });
 
@@ -30,10 +32,10 @@ const suggestionSchema = new mongoose.Schema({
 const users = mongoose.model("users", usersSchema);
 const articlesSch = mongoose.model("articles", articlesSchema);
 const comments = mongoose.model("comments", commentsSchema);
-const suggestion = mongoose.model("suggestion", suggestionSchema);
+const suggestions = mongoose.model("suggestions", suggestionSchema);
 
 // module.exports = mongoose.model("users", usersSchema);
 module.exports.users = users;
 module.exports.articlesSch = articlesSch;
 module.exports.comments = comments;
-module.exports.suggestion = suggestion;
+module.exports.suggestions = suggestions;
