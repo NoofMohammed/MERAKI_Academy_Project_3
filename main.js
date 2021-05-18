@@ -3,7 +3,7 @@ const db = require("./db");
 
 const app = express();
 
-const { users, articlesSch, comments } = require("./schema");
+const { users, articlesSch, comments,suggestion} = require("./schema");
 const port = 5000;
 
 app.use(express.json());

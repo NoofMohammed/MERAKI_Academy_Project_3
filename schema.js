@@ -22,10 +22,18 @@ const commentsSchema = new mongoose.Schema({
   comment: { type:String },
   commenter: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
 });
+const suggestionSchema = new mongoose.Schema({
+  suggestion : { type:String },
+  proposed: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+});
+
 const users = mongoose.model("users", usersSchema);
 const articlesSch = mongoose.model("articles", articlesSchema);
 const comments = mongoose.model("comments", commentsSchema);
+const suggestion = mongoose.model("suggestion", suggestionSchema);
+
 // module.exports = mongoose.model("users", usersSchema);
 module.exports.users = users;
 module.exports.articlesSch = articlesSch;
 module.exports.comments = comments;
+module.exports.suggestion = suggestion;
