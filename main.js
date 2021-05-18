@@ -101,9 +101,9 @@ articlesRouter.delete("/articles", async (req, res) => {
   const firstName = req.body.author;
   const author = await users.findOne({ firstName });
 
-  const _id = author.id;
+  const authorId = author.id;
   articlesSch
-    .deleteMany({ _id })
+    .deleteMany({ author: authorId })
     .then((result) => {
       res.send(result);
     })
@@ -155,25 +155,27 @@ app.post("/login", (req, res) => {
 });
 // createNewComment
 
-app.post("/articles/:id/comments", (req, res) => {
+app.post("/articles/:id/comments", async (req, res) => {
+  const articleId = req.params.id;
+  const article = await articlesSch.findOne({ _id: articleId });
   const { comment, commenter } = req.body;
   const newComment = new comments({
     comment,
     commenter,
   });
-  // const articles = {title,description,author,comment}
-  // const article = { articles: id };
-  // article.push(comment._id);
 
   newComment
     .save()
-    .then((result) => {
-      db.articlesSch.update(
-        { _id },
-        { $push: { comment: _id } }
-     ).
+    .then((resultComment) => {
+      // article.comment.push(resultComment._id).save();
+      console.log(resultComment._id, article);
+
+      articlesSch.updateOne(
+        { _id: articleId },
+        { $push: { comment: [resultComment._id] } }
+      );
       res.status(201);
-      res.json(result);
+      res.json(resultComment);
     })
     .catch((err) => {
       res.send(err);
