@@ -66,7 +66,7 @@ articlesRouter.get("/articles/search_2/:id", (req, res) => {
     .populate("author", "firstName ")
     .exec()
     .then((result) => {
-      res.send(result)
+      res.send(result);
     });
 });
 
@@ -89,15 +89,10 @@ articlesRouter.post("/articles", (req, res) => {
 });
 
 articlesRouter.put("/articles/:id", (req, res) => {
-  const id = req.params.id;
-  const {title,description,authorId} = req.body;
+  const _id = req.params.id;
+  const { title, description, authorId } = req.body;
   articlesSch
-    .findOneAndUpdate(
-      {title,
-        description,
-        author:authorId
-      }
-    )
+    .findOneAndUpdate({ title, description, author: authorId })
     .then((result) => {
       res.send(result);
     })
@@ -106,30 +101,16 @@ articlesRouter.put("/articles/:id", (req, res) => {
     });
 });
 
-
-
-
-  
-
 articlesRouter.delete("/articles/:id", (req, res) => {
-
-
-
-
-  let result = {};
-
-  const id = req.params.id;
-  for (let i = 0; i < articles.length; i++) {
-    if (id == articles[i].id) {
-      articles.splice(i, 1);
-      result = {
-        success: "true",
-        massage: `Success Delete article with ${id}`,
-      };
-    }
-  }
-  res.status(200);
-  res.json(result);
+  const _id = req.params.id;
+  articlesSch
+    .findOneAndRemove({ _id })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 articlesRouter.delete("/articles", (req, res) => {
