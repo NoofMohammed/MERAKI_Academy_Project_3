@@ -6,32 +6,11 @@ const app = express();
 const { users, articlesSch } = require("./schema");
 const port = 5000;
 
-const { uuid } = require("uuidv4");
+// const { uuid } = require("uuidv4");
 
 app.use(express.json());
 const articlesRouter = express.Router();
 const usersRouter = express.Router();
-
-const articles = [
-  {
-    id: 1,
-    title: "How I learn coding?",
-    description: "Lorem, Quam, mollitia.",
-    author: "Jouza",
-  },
-  {
-    id: 2,
-    title: "Coding Best Practices",
-    description: "Lorem, ipsum dolor sit, Quam, mollitia.",
-    author: "Besslan",
-  },
-  {
-    id: 3,
-    title: "Debugging",
-    description: "Lorem, Quam, mollitia.",
-    author: "Jouza",
-  },
-];
 
 articlesRouter.get("/articles", (req, res) => {
   articlesSch
@@ -114,19 +93,15 @@ articlesRouter.delete("/articles/:id", (req, res) => {
 });
 
 articlesRouter.delete("/articles", (req, res) => {
-  let result = {};
-  const author = req.body.author;
-  for (let i = 0; i < articles.length; i++) {
-    if (articles[i].author === author) {
-      articles.splice(i, 1);
-      result = {
-        success: "true",
-        massage: `Success delete all the articles for the author => ${author}`,
-      };
-    }
-  }
-  res.status(200);
-  res.json(result);
+  const _id = req.params.id;
+  articlesSch
+    .findOneAndRemove({ _id })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 app.post("/users", (req, res) => {
