@@ -7,6 +7,7 @@ const usersSchema = new mongoose.Schema({
   country: { type: String },
   email: { type: String },
   password: { type: String },
+  role:{ type: mongoose.Schema.Types.ObjectId, ref: "roles" }
   // author: {type: String}
 });
 
