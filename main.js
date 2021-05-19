@@ -1,5 +1,10 @@
 const express = require("express");
 const db = require("./db");
+const bcrypt = require("bcrypt");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+
+
 
 const app = express();
 
@@ -157,8 +162,6 @@ app.post("/login", (req, res) => {
 
 app.post("/articles/:id/comments", async (req, res) => {
   const articleId = req.params.id;
-  console.log(99999999)
-  // const article = await articlesSch.findOne({ _id: articleId });
   const { comment, commenter } = req.body;
   const newComment = new comments({
     comment,
@@ -168,7 +171,6 @@ app.post("/articles/:id/comments", async (req, res) => {
   newComment
     .save()
     .then((resultComment) => {
-      // article.comment.push(resultComment._id).save();
       console.log(resultComment._id, "artile");
 
       articlesSch.updateOne(
@@ -187,8 +189,7 @@ app.post("/articles/:id/comments", async (req, res) => {
 // createNewSuggestion
 app.post("/articles/:id/suggestions",  (req, res) => {
   console.log(777777)
-  const suggestionId = req.params.id;
-  // const article = await suggestions.findOne({ _id: suggestionId });
+  const articleId = req.params.id;
   const { suggestion, proposed } = req.body;
   const newSugg = new suggestions({
     suggestion,
@@ -198,11 +199,13 @@ app.post("/articles/:id/suggestions",  (req, res) => {
     .save()
     .then((resultSugg) => {
       console.log(resultSugg._id)
-      suggestions.updateOne(
-        { _id: suggestionId },
+      articlesSch.updateOne(
+        { _id: articleId },
         { $push: { suggestion: resultSugg._id } }
       )
       .exec()
+      res.status(201);
+      res.json(resultSugg);
     })
     .catch((err) => {
       res.status(401);
