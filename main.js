@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-const { users, articlesSch, comments, suggestions } = require("./schema");
+const { users, articlesSch, comments, suggestions,roles } = require("./schema");
 const port = 5000;
 
 app.use(express.json());
