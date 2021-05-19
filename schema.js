@@ -29,6 +29,11 @@ const suggestionSchema = new mongoose.Schema({
   proposed: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
 });
 
+// const rolesSchema = new mongoose.Schema({
+//   role: "Admin",
+//   permissions: ["MANAGE_USERS", "CREATE_COMMENTS"]
+// })
+
 
 usersSchema.pre("save", async function () {
   const salt = 10;
@@ -43,11 +48,13 @@ const users = mongoose.model("users", usersSchema);
 const articlesSch = mongoose.model("articles", articlesSchema);
 const comments = mongoose.model("comments", commentsSchema);
 const suggestions = mongoose.model("suggestions", suggestionSchema);
+// const roles = mongoose.model("roles", rolesSchema);
 
 // module.exports = mongoose.model("users", usersSchema);
 module.exports.users = users;
 module.exports.articlesSch = articlesSch;
 module.exports.comments = comments;
 module.exports.suggestions = suggestions;
+// module.exports.roles = roles;
 
 

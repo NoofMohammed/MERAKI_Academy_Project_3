@@ -164,9 +164,23 @@ app.post("/login", async (req, res) => {
     });
   });
 });
+
+const authentication = (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  jwt.verify(token, secret, (err, result) => {
+    if (token !== secret) {
+      res.status(401);
+      return res.json({massge:"the token is invalid", status:401});
+    }
+    if (token === secret) {
+      next();
+    }
+  });
+};
+
 // createNewComment
 
-app.post("/articles/:id/comments", async (req, res) => {
+app.post("/articles/:id/comments", authentication, async (req, res) => {
   const articleId = req.params.id;
   const { comment, commenter } = req.body;
   const newComment = new comments({
@@ -192,6 +206,8 @@ app.post("/articles/:id/comments", async (req, res) => {
       res.send(err);
     });
 });
+
+// createNewComment
 
 // createNewSuggestion
 app.post("/articles/:id/suggestions", (req, res) => {
