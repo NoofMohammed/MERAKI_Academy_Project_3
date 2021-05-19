@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcrypt");
 const usersSchema = new mongoose.Schema({
   firstName: { type: String },
   lastName: { type: String },
@@ -29,6 +29,16 @@ const suggestionSchema = new mongoose.Schema({
   proposed: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
 });
 
+
+usersSchema.pre("save", async function () {
+  const salt = 10;
+
+  this.email = this.email.toLowerCase();
+  
+  this.password = await bcrypt.hash(this.password, salt);
+  console.log(this.password, 9999999999999999999);
+});
+
 const users = mongoose.model("users", usersSchema);
 const articlesSch = mongoose.model("articles", articlesSchema);
 const comments = mongoose.model("comments", commentsSchema);
@@ -39,3 +49,5 @@ module.exports.users = users;
 module.exports.articlesSch = articlesSch;
 module.exports.comments = comments;
 module.exports.suggestions = suggestions;
+
+

@@ -4,8 +4,6 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-
-
 const app = express();
 
 const { users, articlesSch, comments, suggestions } = require("./schema");
@@ -137,26 +135,34 @@ app.post("/users", (req, res) => {
       res.send(err);
     });
 });
+const secret = process.env.SECRET;
 // 1.login
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  users.findOne({ email }).then((result) => {
+    console.log({ result });
+    if (!result) {
+      return res.json({ message: "The email doesn't exist", status: 404 });
+    }
+    const payload = {
+      userId: result._id,
+      country: result.country,
+    };
+    const options = { expiresIn: "60m" };
 
-  users
-    .findOne({ password, email })
+    const token = jwt.sign(payload, secret, options);
 
-    .then((result) => {
-      if (result) {
-        res.status(200);
-        res.json("Valid login credentials");
+    bcrypt.compare(password, result.password, (err, resultPassword) => {
+      if (resultPassword === true) {
+        res.json({ token: token });
       } else {
-        res.status(401);
-        res.json("Invalid login credentials");
-        ("Invalid login credentials");
+        return res.json({
+          message: "The password you’ve entered is incorrect",
+          status: 403,
+        });
       }
-    })
-    .catch((err) => {
-      res.send(err);
     });
+  });
 });
 // createNewComment
 
@@ -173,11 +179,12 @@ app.post("/articles/:id/comments", async (req, res) => {
     .then((resultComment) => {
       console.log(resultComment._id, "artile");
 
-      articlesSch.updateOne(
-        { _id: articleId },
-        { $push: { comment: resultComment._id } }
-      )
-      .exec()
+      articlesSch
+        .updateOne(
+          { _id: articleId },
+          { $push: { comment: resultComment._id } }
+        )
+        .exec();
       res.status(201);
       res.json(resultComment);
     })
@@ -187,8 +194,8 @@ app.post("/articles/:id/comments", async (req, res) => {
 });
 
 // createNewSuggestion
-app.post("/articles/:id/suggestions",  (req, res) => {
-  console.log(777777)
+app.post("/articles/:id/suggestions", (req, res) => {
+  console.log(777777);
   const articleId = req.params.id;
   const { suggestion, proposed } = req.body;
   const newSugg = new suggestions({
@@ -198,12 +205,13 @@ app.post("/articles/:id/suggestions",  (req, res) => {
   newSugg
     .save()
     .then((resultSugg) => {
-      console.log(resultSugg._id)
-      articlesSch.updateOne(
-        { _id: articleId },
-        { $push: { suggestion: resultSugg._id } }
-      )
-      .exec()
+      console.log(resultSugg._id);
+      articlesSch
+        .updateOne(
+          { _id: articleId },
+          { $push: { suggestion: resultSugg._id } }
+        )
+        .exec();
       res.status(201);
       res.json(resultSugg);
     })
@@ -212,6 +220,10 @@ app.post("/articles/:id/suggestions",  (req, res) => {
       res.json(err);
     });
 });
+
+// createNewAuthor [Level 1]:
+
+// login [Level 1]
 
 app.use(articlesRouter);
 app.use(usersRouter);
