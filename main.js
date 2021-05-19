@@ -6,7 +6,13 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-const { users, articlesSch, comments, suggestions,roles } = require("./schema");
+const {
+  users,
+  articlesSch,
+  comments,
+  suggestions,
+  roles,
+} = require("./schema");
 const port = 5000;
 
 app.use(express.json());
@@ -116,7 +122,7 @@ articlesRouter.delete("/articles", async (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-  const { firstName, lastName, age, country, email, password } = req.body;
+  const { firstName, lastName, age, country, email, password, role } = req.body;
   const newUser = new users({
     firstName,
     lastName,
@@ -124,6 +130,7 @@ app.post("/users", (req, res) => {
     country,
     email,
     password,
+    role,
   });
   newUser
     .save()
@@ -139,30 +146,38 @@ const secret = process.env.SECRET;
 // 1.login
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  users.findOne({ email }).then((result) => {
-    console.log({ result });
-    if (!result) {
-      return res.json({ message: "The email doesn't exist", status: 404 });
-    }
-    const payload = {
-      userId: result._id,
-      country: result.country,
-    };
-    const options = { expiresIn: "60m" };
-
-    const token = jwt.sign(payload, secret, options);
-
-    bcrypt.compare(password, result.password, (err, resultPassword) => {
-      if (resultPassword === true) {
-        res.json({ token: token });
-      } else {
-        return res.json({
-          message: "The password you’ve entered is incorrect",
-          status: 403,
-        });
+  users
+    .findOne({ email })
+    .populate("role", "role permissions ")
+    .exec()
+    .then((result) => {
+      if (!result) {
+        return res.json({ message: "The email doesn't exist", status: 404 });
       }
+      const payload = {
+        userId: result._id,
+        country: result.country,
+        role: {
+          role: result.role.role,
+          permissions: result.role.permissions
+        },
+      };
+      console.log({ payload });
+      const options = { expiresIn: "60m" };
+
+      const token = jwt.sign(payload, secret, options);
+
+      bcrypt.compare(password, result.password, (err, resultPassword) => {
+        if (resultPassword === true) {
+          res.json({ token: token });
+        } else {
+          return res.json({
+            message: "The password you’ve entered is incorrect",
+            status: 403,
+          });
+        }
+      });
     });
-  });
 });
 
 const authentication = (req, res, next) => {
@@ -170,7 +185,7 @@ const authentication = (req, res, next) => {
   jwt.verify(token, secret, (err, result) => {
     if (token !== secret) {
       res.status(401);
-      return res.json({massge:"the token is invalid", status:401});
+      return res.json({ massge: "the token is invalid", status: 401 });
     }
     if (token === secret) {
       next();
@@ -191,8 +206,6 @@ app.post("/articles/:id/comments", authentication, async (req, res) => {
   newComment
     .save()
     .then((resultComment) => {
-      console.log(resultComment._id, "artile");
-
       articlesSch
         .updateOne(
           { _id: articleId },
@@ -211,7 +224,6 @@ app.post("/articles/:id/comments", authentication, async (req, res) => {
 
 // createNewSuggestion
 app.post("/articles/:id/suggestions", (req, res) => {
-  console.log(777777);
   const articleId = req.params.id;
   const { suggestion, proposed } = req.body;
   const newSugg = new suggestions({
@@ -221,7 +233,6 @@ app.post("/articles/:id/suggestions", (req, res) => {
   newSugg
     .save()
     .then((resultSugg) => {
-      console.log(resultSugg._id);
       articlesSch
         .updateOne(
           { _id: articleId },
@@ -237,9 +248,22 @@ app.post("/articles/:id/suggestions", (req, res) => {
     });
 });
 
-// createNewAuthor [Level 1]:
-
-// login [Level 1]
+app.post("/roles", (req, res) => {
+  const { role, permissions } = req.body;
+  const newRole = new roles({
+    role,
+    permissions,
+  });
+  newRole
+    .save()
+    .then((result) => {
+      res.status(201);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
 
 app.use(articlesRouter);
 app.use(usersRouter);
@@ -247,3 +271,5 @@ app.use(usersRouter);
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
 });
+// "Admin"
+// ["MANAGE_USERS", "CREATE_COMMENTS"]

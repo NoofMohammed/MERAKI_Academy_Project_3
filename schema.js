@@ -31,8 +31,8 @@ const suggestionSchema = new mongoose.Schema({
 });
 
 const rolesSchema = new mongoose.Schema({
-  role: "Admin",
-  permissions: ["MANAGE_USERS", "CREATE_COMMENTS"]
+  role: {type:String},
+  permissions: [{type:String}]
 })
 
 
