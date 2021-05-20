@@ -185,11 +185,10 @@ const authentication = (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   jwt.verify(token, secret, (err, result) => {
     if (err) {
-      res.status(401);
       return res.json({ massge: "the token is invalid", status: 401 });
     }
     if (result) {
-      req.token = result;
+      req.result = result;
       console.log(result);
       next();
     }
@@ -206,20 +205,11 @@ const authentication = (req, res, next) => {
 // }
 const authorization = (str) => {
   return (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
-    jwt.verify(token, secret, (err, result) => {
-      if (err) {
-        return res.json({ massge: "the token is invalid", status: 401 });
-      }
-      if (result) {
-        const permissions = result.role.permissions;
-        console.log("permissions", permissions);
-        if (permissions.indexOf(str) > -1) {
-          return next();
-        }
-        return res.json({ message: "forbidden ", status: 403 });
-      }
-    });
+    const permissions = req.result.role.permissions;
+    if (permissions.indexOf(str) > -1) {
+      return next();
+    }
+    return res.json({ message: "forbidden ", status: 403 });
   };
 };
 
@@ -252,7 +242,7 @@ app.post(
       });
   }
 );
-
+// I add createNewSuggestion this is thing additional no question
 // createNewSuggestion
 app.post("/articles/:id/suggestions", (req, res) => {
   const articleId = req.params.id;
