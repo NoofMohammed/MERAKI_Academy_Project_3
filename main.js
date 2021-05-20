@@ -213,7 +213,7 @@ const authorization = (str) => {
       }
       if (result) {
         const permissions = result.role.permissions;
-        console.log('permissions',permissions);
+        console.log("permissions", permissions);
         if (permissions.indexOf(str) > -1) {
           return next();
         }
@@ -223,32 +223,35 @@ const authorization = (str) => {
   };
 };
 
-app.post("/articles/:id/comments", authentication, authorization("CREATE_COMMENTS"), async (req, res) => {
-  const articleId = req.params.id;
-  const { comment, commenter } = req.body;
-  const newComment = new comments({
-    comment,
-    commenter,
-  });
-
-  newComment
-    .save()
-    .then((resultComment) => {
-      articlesSch
-        .updateOne(
-          { _id: articleId },
-          { $push: { comment: resultComment._id } }
-        )
-        .exec();
-      res.status(201);
-      res.json(resultComment);
-    })
-    .catch((err) => {
-      res.send(err);
+app.post(
+  "/articles/:id/comments",
+  authentication,
+  authorization("CREATE_COMMENTS"),
+  async (req, res) => {
+    const articleId = req.params.id;
+    const { comment, commenter } = req.body;
+    const newComment = new comments({
+      comment,
+      commenter,
     });
-});
 
-// createNewComment
+    newComment
+      .save()
+      .then((resultComment) => {
+        articlesSch
+          .updateOne(
+            { _id: articleId },
+            { $push: { comment: resultComment._id } }
+          )
+          .exec();
+        res.status(201);
+        res.json(resultComment);
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  }
+);
 
 // createNewSuggestion
 app.post("/articles/:id/suggestions", (req, res) => {
@@ -299,5 +302,3 @@ app.use(usersRouter);
 app.listen(port, () => {
   console.log(`The server is start ${port}`);
 });
-// "Admin"
-// ["MANAGE_USERS", "CREATE_COMMENTS"]
