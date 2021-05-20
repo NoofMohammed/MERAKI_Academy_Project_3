@@ -5,6 +5,8 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 const app = express();
+const secret = process.env.SECRET;
+console.log(secret);
 
 const {
   users,
@@ -18,7 +20,43 @@ const port = 5000;
 app.use(express.json());
 const articlesRouter = express.Router();
 const usersRouter = express.Router();
-// getAllArticles
+
+// login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  users
+    .findOne({ email })
+    .populate("role", "role permissions ")
+    .exec()
+    .then((result) => {
+      if (!result) {
+        return res.json({ message: "The email doesn't exist", status: 404 });
+      }
+      const payload = {
+        userId: result._id,
+        country: result.country,
+        role: {
+          role: result.role.role,
+          permissions: result.role.permissions,
+        },
+      };
+      const options = { expiresIn: "60m" };
+
+      const token = jwt.sign(payload, secret, options);
+
+      bcrypt.compare(password, result.password, (err, resultPassword) => {
+        if (resultPassword === true) {
+          res.json({ token: token });
+        } else {
+          return res.json({
+            message: "The password you’ve entered is incorrect",
+            status: 403,
+          });
+        }
+      });
+    });
+});
+// getAllArtrses
 articlesRouter.get("/articles", (req, res) => {
   articlesSch
     .find({})
@@ -142,60 +180,50 @@ app.post("/users", (req, res) => {
       res.send(err);
     });
 });
-const secret = process.env.SECRET;
-// 1.login
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  users
-    .findOne({ email })
-    .populate("role", "role permissions ")
-    .exec()
-    .then((result) => {
-      if (!result) {
-        return res.json({ message: "The email doesn't exist", status: 404 });
-      }
-      const payload = {
-        userId: result._id,
-        country: result.country,
-        role: {
-          role: result.role.role,
-          permissions: result.role.permissions
-        },
-      };
-      console.log({ payload });
-      const options = { expiresIn: "60m" };
-
-      const token = jwt.sign(payload, secret, options);
-
-      bcrypt.compare(password, result.password, (err, resultPassword) => {
-        if (resultPassword === true) {
-          res.json({ token: token });
-        } else {
-          return res.json({
-            message: "The password you’ve entered is incorrect",
-            status: 403,
-          });
-        }
-      });
-    });
-});
 
 const authentication = (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   jwt.verify(token, secret, (err, result) => {
-    if (token !== secret) {
+    if (err) {
       res.status(401);
       return res.json({ massge: "the token is invalid", status: 401 });
     }
-    if (token === secret) {
+    if (result) {
+      req.token = result;
+      console.log(result);
       next();
     }
   });
 };
 
-// createNewComment
+// Create a closure function
+// {
+//   userId: '60a5f64c91858052b8961d35',
+//   country: 'Yemen',
+//   role: { role: 'Admin', permissions: [ 'MANAGE_USERS', 'CREATE_COMMENTS' ] },
+//   iat: 1621489237,
+//   exp: 1621492837
+// }
+const authorization = (str) => {
+  return (req, res, next) => {
+    const token = req.headers.authorization.split(" ")[1];
+    jwt.verify(token, secret, (err, result) => {
+      if (err) {
+        return res.json({ massge: "the token is invalid", status: 401 });
+      }
+      if (result) {
+        const permissions = result.role.permissions;
+        console.log('permissions',permissions);
+        if (permissions.indexOf(str) > -1) {
+          return next();
+        }
+        return res.json({ message: "forbidden ", status: 403 });
+      }
+    });
+  };
+};
 
-app.post("/articles/:id/comments", authentication, async (req, res) => {
+app.post("/articles/:id/comments", authentication, authorization("CREATE_COMMENTS"), async (req, res) => {
   const articleId = req.params.id;
   const { comment, commenter } = req.body;
   const newComment = new comments({
