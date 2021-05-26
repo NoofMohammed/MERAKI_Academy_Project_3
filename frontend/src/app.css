@@ -1,8 +1,16 @@
-h4{
-    border: 13px blue;
+.main{
+    border: solid 4px;
+    color: blueviolet;
+}
+
+.title{
+    border: solid 2px;
+    color: rgb(228, 127, 33);
     
 }
 .data{
+    border: solid 2px;
+    color: rgb(66, 14, 40);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
