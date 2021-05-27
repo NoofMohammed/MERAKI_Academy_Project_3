@@ -7,6 +7,7 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Route path="/" component={App} />
+      {/* <Route path="/" component={Main} /> */}
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")

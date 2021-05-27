@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import Navigation from "./Navigation";
+
+
 
 import axios from "axios";
 import "../app.css";
+
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -33,6 +37,7 @@ const Register = () => {
   };
   return (
     <>
+    <Navigation/>
       <div className="data">
         <h5>Register:</h5>
         <input
