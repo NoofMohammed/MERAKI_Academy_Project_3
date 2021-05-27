@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, Route } from "react-router-dom";
 import Register from "./components/Register";
-// import login from "./components/Login"
-
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import Navigation from "./components/Navigation";
 
 // import axios from "axios";
 import "./app.css";
@@ -12,22 +13,13 @@ const App = () => {
   return (
     <>
       <Navigation />
-      <div class="main">
+      <div className="main">
         <Route path="/Register" component={Register} />
-        {/* <Route path="/login" component={login} /> */}
+        <Route path="/Login" component={Login} />
+        <Route path="/dashboard" component={Dashboard} />
       </div>
     </>
   );
 };
-
-const Navigation = () => {
-  return (
-    <div style={{ display: "flex", gap: "16px" }}>
-      <Link to="/Register">Register</Link>
-      {/* <Link to="login">login</Link> */}
-    </div>
-  );
-};
-
 
 export default App;

@@ -24,16 +24,16 @@ const Register = () => {
       })
       .then((res) => {
         console.log("The user has been created successfully");
-        setResult("The user has been created successfully")
+        setResult("The user has been created successfully");
       })
       .catch((err) => {
         console.log("Error happened while register, please try again");
-        setResult("Error happened while register, please try again")
+        setResult("Error happened while register, please try again");
       });
   };
   return (
     <>
-      <div class="data">
+      <div className="data">
         <h5>Register:</h5>
         <input
           onChange={(e) => {
@@ -80,7 +80,7 @@ const Register = () => {
         <button onClick={newData}>Register</button>
 
         <div>
-            <p>{result}</p>
+          <p>{result}</p>
         </div>
       </div>
     </>
