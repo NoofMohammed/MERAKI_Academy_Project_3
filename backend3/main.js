@@ -23,11 +23,6 @@ app.use(authRouter);
 app.use(commentsRouter);
 app.use(roleRouter);
 
-app.post('/aa', (req, res) => {
-  console.log('POST /aa');
-  res.json('result');
-});
-
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`server on ${PORT}`);

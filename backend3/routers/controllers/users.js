@@ -2,6 +2,7 @@ const usersModel = require('./../../db/models/users');
 
 const createNewAuthor = (req, res) => {
 	const { firstName, lastName, age, country, email, password, role } = req.body;
+	
 
 	const user = new usersModel({
 		firstName,
@@ -22,6 +23,7 @@ const createNewAuthor = (req, res) => {
 			res.send(err);
 		});
 };
+
 
 module.exports = {
 	createNewAuthor,
